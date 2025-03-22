@@ -1,4 +1,6 @@
 import ComputerCard from "@/components/ComputerCard";
+import UserPhoto from "@/components/UserPhoto";
+import LogoutButton from "@/components/LogoutButton";
 import { ComputerStations } from "@/constants/ComputerStations";
 
 export default function Home() {
@@ -14,8 +16,13 @@ export default function Home() {
   return (
     <div className="flex flex-col h-screen">
       {/* Header Section */}
-      <section className="p-4 flex items-center justify-center w-full">
+      <section className="p-4 flex items-center justify-between">
+        <div className="w-[150px]" /> {/* Spacer to balance the header */}
         <h1 className="text-quaternary text-center text-4xl font-bold">WUT SK Calendar</h1>
+        <div className="flex items-center gap-4 w-[150px]">
+          <UserPhoto />
+          <LogoutButton />
+        </div>
       </section>
 
       {/* Main Section */}
@@ -33,7 +40,7 @@ export default function Home() {
       </section>
 
       {/* Footer Section */}
-      <section className="p-2 flex flex-col items-center justify-end">
+      <section className="p-2 flex items-center justify-center">
         <p className="text-quinary">© 2025 WUT SK Calendar</p>
       </section>
     </div>
