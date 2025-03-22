@@ -4,15 +4,13 @@ import { useState } from 'react'
 import { Card, CardBody, CardFooter, CardHeader } from "@heroui/react"
 import { ComputerState } from "./computerCardInfo/ComputerState"
 import ComputerStateInfo from "./computerCardInfo/ComputerStateInfo"
-import { DecToHex } from "@/utils/DecToHex"
 import Modal from "./scheduleForm/Modal"
 import ScheduleForm, { ScheduleFormData } from "./scheduleForm/ScheduleForm"
 
-export default function ComputerCard({ id }: { id: number }) {
+export default function ComputerCard({ stationId, state }: { stationId: string, state: ComputerState }) {
   const [isModalOpen, setIsModalOpen] = useState(false)
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [submitError, setSubmitError] = useState<string | null>(null)
-  const stationId = DecToHex(id);
 
   const handleCardClick = () => {
     setIsModalOpen(true)
@@ -72,7 +70,7 @@ export default function ComputerCard({ id }: { id: number }) {
           <CardBody className="h-full flex items-center justify-center">
           </CardBody>
           <CardFooter className="flex items-center justify-center">
-            <ComputerStateInfo state={ComputerState.OFF} />
+            <ComputerStateInfo state={state} />
           </CardFooter>
         </Card>
       </div>

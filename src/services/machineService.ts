@@ -9,7 +9,6 @@ interface MachineConfig {
 
 interface MachineStatus {
   status: string;
-  power: string;
 }
 
 class MachineService {
@@ -22,8 +21,6 @@ class MachineService {
   async fetchMachineData(host: string, file: string): Promise<MachineStatus> {
     try {
       const url = `http://${host}:${this.config.port}/${file}`;
-
-      console.log("fetching", url)
 
       const body = await fetchWithDigest(url, this.config.username, this.config.password);
 
@@ -46,15 +43,12 @@ class MachineService {
         throw new Error("Could not find power status");
       }
 
-      console.log("powerStatus", powerStatus);
-
       return {
-        status: powerStatus.toLowerCase(),
-        power: powerStatus.toLowerCase()
+        status: powerStatus.toLowerCase()
       };
     } catch (error) {
       console.error('Error fetching machine data:', error);
-      throw error;
+      return { status: "unknown" };
     }
   }
 }
