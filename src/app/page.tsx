@@ -2,8 +2,8 @@ import ComputerCard from "@/components/ComputerCard";
 import UserPhoto from "@/components/UserPhoto";
 import LogoutButton from "@/components/LogoutButton";
 import { ComputerStations } from "@/constants/ComputerStations";
-
-export default function Home() {
+import { getStationsData } from "@/utils/getStationsData";
+export default async function Home() {
 
   // Calculate the position for the last row to center remaining items
   const totalStations = ComputerStations.length;
@@ -12,6 +12,9 @@ export default function Home() {
                                 remainingItems === 2 ? 'col-start-3' :
                                 remainingItems === 3 ? 'col-start-2' : '';
 
+  const machineData = await getStationsData();
+
+  console.log(machineData);
 
   return (
     <div className="flex flex-col h-screen">

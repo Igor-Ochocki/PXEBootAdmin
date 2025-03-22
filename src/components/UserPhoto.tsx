@@ -2,9 +2,12 @@
 
 import { useState, useEffect } from 'react'
 import Image from 'next/image'
+import { useRouter } from 'next/navigation'
+import { handleAuthError } from '@/utils/handleAuthError'
 
 export default function UserPhoto() {
   const [photoUrl, setPhotoUrl] = useState<string | null>(null)
+  const router = useRouter()
 
   useEffect(() => {
     const fetchUserData = async () => {
@@ -16,6 +19,12 @@ export default function UserPhoto() {
 
         if (!response.ok) {
           const errorData = await response.json();
+          console.log(errorData)
+          if (errorData.error.includes('401')) {
+            await handleAuthError();
+            router.push('/auth/login');
+            return;
+          }
           throw new Error(errorData.error || 'Failed to fetch user data');
         }
 
@@ -28,11 +37,13 @@ export default function UserPhoto() {
         }
       } catch (error) {
         console.error('Error fetching user photo:', error);
+        // If there's an error that wasn't handled above, redirect to login
+        router.push('/auth/login');
       }
     };
 
     fetchUserData();
-  }, []);
+  }, [router]);
 
   return (
     <div className="relative w-12 h-12 rounded-full overflow-hidden border-2 border-quaternary">
