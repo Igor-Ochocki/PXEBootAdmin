@@ -6,8 +6,6 @@ export interface StationData {
   id: number;
   stationId: string;
   status: string;
-  power: string;
-  lastSeen?: string;
 }
 
 export async function getStationsData(): Promise<StationData[]> {

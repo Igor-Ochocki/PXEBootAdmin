@@ -71,13 +71,11 @@ async function getDigestHeader(options: DigestOptions): Promise<string | undefin
     if (!wwwAuthenticate) {
       throw new Error('No WWW-Authenticate header received');
     }
-    console.log('WWW-Authenticate:', wwwAuthenticate);
 
     // Parse the Digest Authentication challenge
     const authParams = parseAuthHeader(wwwAuthenticate);
 
     const digestHeader = constructDigestAuthHeader(authParams, options);
-    console.log('Digest Authorization Header:', digestHeader);
 
     return digestHeader;
   } catch (error) {
@@ -106,9 +104,7 @@ export async function fetchWithDigest(url: string, username: string, password: s
       },
     });
 
-    console.log(`Status: ${response.status}`);
     const body = await response.text();
-    console.log('Response Body:', body);
     return body;
   } catch (error) {
     console.error('Error fetching data:', error);

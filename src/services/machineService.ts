@@ -1,4 +1,5 @@
 import { fetchWithDigest } from '@/utils/fetchWithDigest';
+import * as cheerio from 'cheerio';
 
 interface MachineConfig {
   port: number;
@@ -9,8 +10,6 @@ interface MachineConfig {
 interface MachineStatus {
   status: string;
   power: string;
-  lastSeen?: string;
-  // Add other specific fields you expect from the machine
 }
 
 class MachineService {
@@ -28,9 +27,31 @@ class MachineService {
 
       const body = await fetchWithDigest(url, this.config.username, this.config.password);
 
-      console.log("body", body)
+      if (!body) {
+        throw new Error("No body");
+      }
 
-      return { status: "unknown", power: "unknown" };
+      // Load the HTML content into cheerio
+      const $ = cheerio.load(body);
+
+      // Find the row where the first cell contains "Power"
+      const powerRow = $('td.r1').filter(function() {
+        return $(this).find('p').text().trim() === 'Power';
+      });
+
+      // Get the next td element which contains the power status
+      const powerStatus = powerRow.next('td.r1').text().trim();
+
+      if (!powerStatus) {
+        throw new Error("Could not find power status");
+      }
+
+      console.log("powerStatus", powerStatus);
+
+      return {
+        status: powerStatus.toLowerCase(),
+        power: powerStatus.toLowerCase()
+      };
     } catch (error) {
       console.error('Error fetching machine data:', error);
       throw error;
