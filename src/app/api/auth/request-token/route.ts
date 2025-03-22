@@ -1,21 +1,23 @@
-import { NextResponse } from 'next/server';
+import { NextRequest, NextResponse } from 'next/server';
 import { USOS_CONFIG } from '@/config/usos';
 import { getAuthorizationHeader } from '@/utils/oauth';
 
-export async function GET() {
+export async function GET(request: NextRequest) {
   try {
     const requestTokenUrl = `${USOS_CONFIG.baseUrl}/services/oauth/request_token`;
+
+    const callbackUrl = `${request.headers.get('host')}/api/auth/callback`;
 
     // Log the configuration (without sensitive data)
     console.log('USOS Configuration:', {
       baseUrl: USOS_CONFIG.baseUrl,
-      callbackUrl: USOS_CONFIG.callbackUrl,
+      callbackUrl: callbackUrl,
       consumerKey: USOS_CONFIG.consumerKey,
       scopes: USOS_CONFIG.scopes
     });
 
     const requestParams = {
-      oauth_callback: USOS_CONFIG.callbackUrl,
+      oauth_callback: callbackUrl,
       scopes: USOS_CONFIG.scopes
     };
 

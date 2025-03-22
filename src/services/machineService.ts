@@ -1,4 +1,4 @@
-import { fetchWithRetry } from '@/utils/fetchWithRetry';
+import { fetchWithDigest } from '@/utils/fetchWithDigest';
 
 interface MachineConfig {
   port: number;
@@ -24,20 +24,13 @@ class MachineService {
     try {
       const url = `http://${host}:${this.config.port}/${file}`;
 
-      const response = await fetchWithRetry(url, {
-        auth: {
-          username: this.config.username,
-          password: this.config.password
-        },
-        retries: 1,
-        retryDelay: 1000
-      });
+      console.log("fetching", url)
 
-      if (!response.ok) {
-        throw new Error(`HTTP error! status: ${response.status}`);
-      }
+      const body = await fetchWithDigest(url, this.config.username, this.config.password);
 
-      return await response.json();
+      console.log("body", body)
+
+      return { status: "unknown", power: "unknown" };
     } catch (error) {
       console.error('Error fetching machine data:', error);
       throw error;

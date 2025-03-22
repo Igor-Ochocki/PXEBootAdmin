@@ -15,10 +15,10 @@ export async function getStationsData(): Promise<StationData[]> {
     const stationsData = await Promise.all(
       ComputerStations.map(async (station) => {
         const stationId = DecToHex(station);
-        const host = `station-${stationId}.local`; // Adjust this pattern to match your network setup
+        const host = `s${stationId}`;
 
         try {
-          const data = await machineService.fetchMachineData(host, 'status');
+          const data = await machineService.fetchMachineData(host, 'index.htm');
           return {
             id: station,
             stationId,

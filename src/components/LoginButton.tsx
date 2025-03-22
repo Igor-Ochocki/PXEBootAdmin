@@ -9,7 +9,7 @@ export default function LoginButton() {
   const handleLogin = async () => {
     try {
       setIsLoading(true)
-      const response = await fetch('/api/auth/request-token')
+      const response = await fetch(`/api/auth/request-token`)
       const data = await response.json()
 
       if (!response.ok) {
