@@ -20,9 +20,9 @@ export default async function Home() {
     <div className="flex flex-col h-screen">
       {/* Header Section */}
       <section className="p-4 flex items-center justify-between">
-        <div className="w-[150px]" /> {/* Spacer to balance the header */}
+        <div className="w-[200px]" /> {/* Spacer to balance the header */}
         <h1 className="text-quaternary text-center text-4xl font-bold">WUT SK Calendar</h1>
-        <div className="flex items-center gap-4 w-[150px]">
+        <div className="flex items-center gap-4 w-[200px]">
           <UserPhoto />
           <LogoutButton />
         </div>
