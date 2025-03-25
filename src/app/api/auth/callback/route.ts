@@ -8,6 +8,7 @@ export async function GET(request: NextRequest) {
     const oauthToken = searchParams.get('oauth_token');
     const oauthVerifier = searchParams.get('oauth_verifier');
     const oauthTokenSecret = request.cookies.get('oauth_token_secret')?.value;
+    const host = request.nextUrl.searchParams.get('host') || 'localhost:3000';
 
     if (!oauthToken || !oauthVerifier || !oauthTokenSecret) {
       throw new Error('Missing required OAuth parameters');
@@ -49,7 +50,7 @@ export async function GET(request: NextRequest) {
     }
 
     // Store the access tokens in secure HTTP-only cookies
-    const nextResponse = NextResponse.redirect(new URL('/', request.url));
+    const nextResponse = NextResponse.redirect(new URL('/', host));
     nextResponse.cookies.set('access_token', accessToken, {
       httpOnly: true,
       secure: process.env.NODE_ENV === 'production',
@@ -66,6 +67,6 @@ export async function GET(request: NextRequest) {
     return nextResponse;
   } catch (error) {
     console.error('Error in callback:', error);
-    return NextResponse.redirect(new URL('/auth/error', request.url));
+    return NextResponse.redirect(new URL('/auth/error', request.nextUrl.searchParams.get('host') || 'localhost:3000'));
   }
 }

@@ -6,7 +6,11 @@ export async function GET(request: NextRequest) {
   try {
     const requestTokenUrl = `${USOS_CONFIG.baseUrl}/services/oauth/request_token`;
 
-    const callbackUrl = `${request.headers.get('host')}/api/auth/callback`;
+    const host = request.headers.get('host');
+    const protocol = request.headers.get('x-forwarded-proto');
+    const hostUrl = `${protocol}://${host}`;
+
+    const callbackUrl = `${hostUrl}/api/auth/callback?host=${hostUrl}`;
 
     // Log the configuration (without sensitive data)
     console.log('USOS Configuration:', {
