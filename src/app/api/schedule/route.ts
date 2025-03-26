@@ -1,3 +1,5 @@
+import { createReservationWithUsosId } from '@/lib/db/reservationUtils';
+import { executeScript } from '@/lib/utils/scriptExecutor';
 import { NextRequest, NextResponse } from 'next/server';
 
 export async function POST(request: NextRequest) {
@@ -29,30 +31,35 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // Log the data to the server console
-    console.log('Schedule form submission received:');
-    console.log('Station ID:', data.stationId);
-    console.log('Start Date:', data.startDate);
-    console.log('Start Time:', data.startTime);
-    console.log('Duration:', data.duration);
-    console.log('Operating System:', data.operatingSystem);
-    console.log('User ID:', data.id);
-    console.log('-----------------------------------');
+    // Combine start date and time into a single datetime
+    const startDateTime = new Date(`${data.startDate}T${data.startTime}`);
 
-    // TODO: Add your scheduling logic here
-    // For example, saving to a database, checking for conflicts, etc.
+    // Create the reservation
+    const reservation = await createReservationWithUsosId({
+      usosId: data.id,
+      stationId: data.stationId,
+      startTime: startDateTime,
+      duration: data.duration
+    });
 
-    // Return a success response
+    // Handle reservation execution on system
+    await executeScript(`echo "amttool ${data.stationId} poweron | at ${startDateTime.toISOString()}" > ~/schedule`);
+
+    // Return a success response with the created reservation
     return NextResponse.json({
       success: true,
-      message: 'Schedule submitted successfully'
+      message: 'Reservation created successfully',
+      data: reservation
     });
   } catch (error) {
     console.error('Error processing schedule submission:', error);
 
     // Return an error response
     return NextResponse.json(
-      { success: false, message: 'Failed to process schedule submission' },
+      {
+        success: false,
+        message: error instanceof Error ? error.message : 'Failed to process schedule submission'
+      },
       { status: 500 }
     );
   }
