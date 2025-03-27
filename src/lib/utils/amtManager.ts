@@ -258,7 +258,7 @@ export class AMTManager {
           <a:Action>http://schemas.dmtf.org/wbem/wscim/1/cim-schema/2/CIM_PowerManagementService/RequestPowerStateChange</a:Action>
           <a:To>/wsman</a:To>
           <w:ResourceURI>http://schemas.dmtf.org/wbem/wscim/1/cim-schema/2/CIM_PowerManagementService</w:ResourceURI>
-          <a:MessageID>${crypto.randomUUID()}</a:MessageID>
+          <a:MessageID>1</a:MessageID>
           <a:ReplyTo>
             <a:Address>http://schemas.xmlsoap.org/ws/2004/08/addressing/role/anonymous</a:Address>
           </a:ReplyTo>
@@ -284,36 +284,48 @@ export class AMTManager {
 
   private createGetPowerStateRequest(): string {
     return `<?xml version="1.0" encoding="utf-8"?>
-      <Envelope xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-                xmlns:xsd="http://www.w3.org/2001/XMLSchema"
-                xmlns:a="http://schemas.xmlsoap.org/ws/2004/08/addressing"
-                xmlns:w="http://schemas.dmtf.org/wbem/wsman/1/wsman.xsd"
-                xmlns="http://www.w3.org/2003/05/soap-envelope">
-        <Header>
-          <a:Action>http://schemas.dmtf.org/wbem/wscim/1/cim-schema/2/CIM_PowerManagementService/GetPowerState</a:Action>
-          <a:To>/wsman</a:To>
-          <w:ResourceURI>http://schemas.dmtf.org/wbem/wscim/1/cim-schema/2/CIM_PowerManagementService</w:ResourceURI>
-          <a:MessageID>${crypto.randomUUID()}</a:MessageID>
-          <a:ReplyTo>
-            <a:Address>http://schemas.xmlsoap.org/ws/2004/08/addressing/role/anonymous</a:Address>
-          </a:ReplyTo>
-          <w:OperationTimeout>PT60S</w:OperationTimeout>
-        </Header>
-        <Body>
-          <r:GetPowerState_INPUT xmlns:r="http://schemas.dmtf.org/wbem/wscim/1/cim-schema/2/CIM_PowerManagementService">
-            <r:ManagedElement>
-              <Address xmlns="http://schemas.xmlsoap.org/ws/2004/08/addressing">http://schemas.xmlsoap.org/ws/2004/08/addressing</Address>
-              <ReferenceParameters xmlns="http://schemas.xmlsoap.org/ws/2004/08/addressing">
-                <ResourceURI xmlns="http://schemas.dmtf.org/wbem/wsman/1/wsman.xsd">http://schemas.dmtf.org/wbem/wscim/1/cim-schema/2/CIM_ComputerSystem</ResourceURI>
-                <SelectorSet xmlns="http://schemas.dmtf.org/wbem/wsman/1/wsman.xsd">
-                  <Selector Name="CreationClassName">CIM_ComputerSystem</Selector>
-                  <Selector Name="Name">ManagedSystem</Selector>
-                </SelectorSet>
-              </ReferenceParameters>
-            </r:ManagedElement>
-          </r:GetPowerState_INPUT>
-        </Body>
-      </Envelope>`;
+<Envelope xmlns="http://www.w3.org/2003/05/soap-envelope"
+          xmlns:a="http://schemas.xmlsoap.org/ws/2004/08/addressing"
+          xmlns:w="http://schemas.dmtf.org/wbem/wsman/1/wsman.xsd">
+  <Header>
+    <a:To>/wsman</a:To>
+    <a:Action>http://schemas.xmlsoap.org/ws/2004/09/transfer/Get</a:Action>
+    <a:MessageID>uuid:${crypto.randomUUID()}</a:MessageID>
+    <a:ReplyTo>
+      <a:Address>http://schemas.xmlsoap.org/ws/2004/08/addressing/role/anonymous</a:Address>
+    </a:ReplyTo>
+    <w:ResourceURI>http://schemas.dmtf.org/wbem/wscim/1/cim-schema/2/CIM_AssociatedPowerManagementService</w:ResourceURI>
+    <w:SelectorSet>
+      <w:Selector Name="UserOfService">
+        <a:EndpointReference>
+          <a:Address>http://schemas.xmlsoap.org/ws/2004/08/addressing/role/anonymous</a:Address>
+          <a:ReferenceParameters>
+            <w:ResourceURI>http://schemas.dmtf.org/wbem/wscim/1/cim-schema/2/CIM_ComputerSystem</w:ResourceURI>
+            <w:SelectorSet>
+              <w:Selector Name="CreationClassName">CIM_ComputerSystem</w:Selector>
+              <w:Selector Name="Name">ManagedSystem</w:Selector>
+            </w:SelectorSet>
+          </a:ReferenceParameters>
+        </a:EndpointReference>
+      </w:Selector>
+      <w:Selector Name="ServiceProvided">
+        <a:EndpointReference>
+          <a:Address>http://schemas.xmlsoap.org/ws/2004/08/addressing/role/anonymous</a:Address>
+          <a:ReferenceParameters>
+            <w:ResourceURI>http://schemas.dmtf.org/wbem/wscim/1/cim-schema/2/CIM_PowerManagementService</w:ResourceURI>
+            <w:SelectorSet>
+              <w:Selector Name="CreationClassName">CIM_PowerManagementService</w:Selector>
+              <w:Selector Name="Name">Intel(r) AMT Power Management Service</w:Selector>
+              <w:Selector Name="SystemCreationClassName">CIM_ComputerSystem</w:Selector>
+              <w:Selector Name="SystemName">Intel(r) AMT</w:Selector>
+            </w:SelectorSet>
+          </a:ReferenceParameters>
+        </a:EndpointReference>
+      </w:Selector>
+    </w:SelectorSet>
+  </Header>
+  <Body/>
+</Envelope>`;
   }
 
   async changePowerState(powerState: PowerState): Promise<boolean> {
@@ -348,7 +360,7 @@ export class AMTManager {
   async getPowerState(): Promise<number> {
     try {
       const response = await this.makeRequest(
-        'http://schemas.dmtf.org/wbem/wscim/1/cim-schema/2/CIM_PowerManagementService/GetPowerState',
+        'http://schemas.dmtf.org/wbem/wscim/1/wsman/Enumerate',
         this.createGetPowerStateRequest()
       );
 
