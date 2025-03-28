@@ -5,11 +5,12 @@ import { Card, CardBody, CardFooter, CardHeader } from "@heroui/react"
 import { ComputerState } from "./computerCardInfo/ComputerState"
 import ComputerStateInfo from "./computerCardInfo/ComputerStateInfo"
 import Modal from "./scheduleForm/Modal"
-import ScheduleForm, { ScheduleFormData } from "./scheduleForm/ScheduleForm"
+// import ScheduleForm, { ScheduleFormData } from "./scheduleForm/ScheduleForm"
+import PowerControlForm from './PowerControlForm'
 
 export default function ComputerCard({ stationId, state }: { stationId: string, state: ComputerState }) {
   const [isModalOpen, setIsModalOpen] = useState(false)
-  const [isSubmitting, setIsSubmitting] = useState(false)
+  // const [isSubmitting, setIsSubmitting] = useState(false)
   const [submitError, setSubmitError] = useState<string | null>(null)
 
   const handleCardClick = () => {
@@ -18,43 +19,42 @@ export default function ComputerCard({ stationId, state }: { stationId: string, 
   }
 
   const handleCloseModal = () => {
-    if (isSubmitting) return; // Prevent closing while submitting
+    // if (isSubmitting) return; // Prevent closing while submitting
     setIsModalOpen(false)
     setSubmitError(null)
   }
 
-  const handleScheduleSubmit = async (formData: ScheduleFormData) => {
-    try {
-      setIsSubmitting(true)
-      setSubmitError(null)
+  // const handleScheduleSubmit = async (formData: ScheduleFormData) => {
+  //   try {
+  //     setIsSubmitting(true)
+  //     setSubmitError(null)
 
-      // Send the data to the API endpoint
-      const response = await fetch('/api/schedule', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          stationId,
-          ...formData
-        }),
-      })
+  //     // Send the data to the API endpoint
+  //     const response = await fetch('/api/schedule', {
+  //       method: 'POST',
+  //       headers: {
+  //         'Content-Type': 'application/json',
+  //       },
+  //       body: JSON.stringify({
+  //         ...formData
+  //       }),
+  //     })
 
-      const result = await response.json()
+  //     const result = await response.json()
 
-      if (!response.ok || !result.success) {
-        throw new Error(result.message || 'Failed to submit schedule')
-      }
+  //     if (!response.ok || !result.success) {
+  //       throw new Error(result.message || 'Failed to submit schedule')
+  //     }
 
-      console.log('Schedule submitted successfully:', result)
-      setIsModalOpen(false)
-    } catch (error) {
-      console.error('Error submitting schedule:', error)
-      setSubmitError(error instanceof Error ? error.message : 'An unknown error occurred')
-    } finally {
-      setIsSubmitting(false)
-    }
-  }
+  //     console.log('Schedule submitted successfully:', result)
+  //     setIsModalOpen(false)
+  //   } catch (error) {
+  //     console.error('Error submitting schedule:', error)
+  //     setSubmitError(error instanceof Error ? error.message : 'An unknown error occurred')
+  //   } finally {
+  //     setIsSubmitting(false)
+  //   }
+  // }
 
   return (
     <>
@@ -82,16 +82,16 @@ export default function ComputerCard({ stationId, state }: { stationId: string, 
               {submitError}
             </div>
           )}
-          <ScheduleForm
-            onSubmit={handleScheduleSubmit}
-            onCancel={isSubmitting ? undefined : handleCloseModal}
+          <PowerControlForm
             stationId={stationId}
+            isOpen={isModalOpen}
+            onClose={handleCloseModal}
           />
-          {isSubmitting && (
+          {/* {isSubmitting && (
             <div className="absolute inset-0 bg-black/30 rounded-xl flex items-center justify-center">
               <div className="animate-pulse text-quaternary font-bold">Submitting...</div>
             </div>
-          )}
+          )} */}
         </div>
       </Modal>
     </>
