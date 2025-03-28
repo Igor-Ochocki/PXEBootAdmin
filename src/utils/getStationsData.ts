@@ -1,6 +1,7 @@
-import { machineService } from '@/services/machineService';
 import { ComputerStations } from '@/constants/ComputerStations';
 import { DecToHex } from '@/utils/DecToHex';
+import { AMTManager, PowerState } from 'amt-manager-test';
+import { config } from 'dotenv';
 
 export interface StationData {
   id: number;
@@ -10,17 +11,32 @@ export interface StationData {
 
 export async function getStationsData(): Promise<StationData[]> {
   try {
+
     const stationsData = await Promise.all(
       ComputerStations.map(async (station) => {
         const stationId = DecToHex(station);
         const host = `s${stationId}`;
+        config();
+
+
+        const amtClient = new AMTManager({
+          host: host,
+          port: 16992,
+          username: process.env.AMT_USERNAME || 'admin',
+          password: process.env.AMT_PASSWORD || 'password',
+          protocol: 'http',
+          timeout: 10000,
+          retries: 3,
+          verifySSL: true,
+          forceIPv4: true
+        });
 
         try {
-          const data = await machineService.fetchMachineData(host, 'index.htm');
+          const data = await amtClient.getPowerState();
           return {
             id: station,
             stationId,
-            ...data
+            status: data === PowerState.PowerOn ? 'Online' : 'Offline'
           };
         } catch {
           // If a station fails, return offline status instead of failing completely
