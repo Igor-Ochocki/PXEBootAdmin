@@ -59,6 +59,36 @@ export const fetchUserFields = async (params: FetchUsedFieldsParams) => {
     return userData;
 }
 
+export const getUserId = async (request: NextRequest) => {
+  const accessToken = request.cookies.get('access_token')?.value;
+  const accessTokenSecret = request.cookies.get('access_token_secret')?.value;
+
+
+  if (!accessToken || !accessTokenSecret) {
+    return NextResponse.json(
+      { error: 'Not authenticated' },
+      { status: 401 }
+    );
+  }
+
+  const userStatus = await fetchUserFields({
+    accessToken: accessToken,
+    accessTokenSecret: accessTokenSecret,
+    fields: 'id'
+  });
+
+  if (!userStatus.id) {
+    return NextResponse.json(
+      { error: 'User data not found' },
+      { status: 404 }
+    );
+  }
+  return NextResponse.json({
+    status: 200,
+    id: userStatus.id
+  });
+}
+
 export const getUserStatus = async (request: NextRequest) => {
   const accessToken = request.cookies.get('access_token')?.value;
   const accessTokenSecret = request.cookies.get('access_token_secret')?.value;

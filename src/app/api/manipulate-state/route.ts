@@ -1,7 +1,8 @@
 import { AMTManager } from 'amt-manager-test';
 import { NextResponse, NextRequest } from 'next/server';
 import { config } from 'dotenv';
-import { getUserStatus } from '@/utils/userFieldsFetch';
+import { getUserId, getUserStatus } from '@/utils/userFieldsFetch';
+import { logAction } from '@/lib/utils/db';
 
 export async function POST(request: NextRequest) {
   try {
@@ -23,6 +24,17 @@ export async function POST(request: NextRequest) {
         { status: 403 }
       );
     }
+
+    const userIdResponse = await getUserId(request);
+
+    if (userIdResponse.status !== 200) {
+      return NextResponse.json(
+        { error: 'User data not found' },
+        { status: 404 }
+      );
+    }
+
+    const userId = (await userIdResponse.json()).id;
 
     // Get station configuration from environment variables or a configuration file
     const stationConfig = {
@@ -59,6 +71,9 @@ export async function POST(request: NextRequest) {
           { status: 400 }
         );
     }
+
+    // Log the action to the database
+    await logAction(userId, action, stationId);
 
     return NextResponse.json({ success: result });
   } catch (error) {
