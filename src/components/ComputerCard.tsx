@@ -1,14 +1,13 @@
 'use client'
 
-import { useState } from 'react'
+import { Suspense, useState } from 'react'
 import { Card, CardBody, CardFooter, CardHeader } from "@heroui/react"
-import { ComputerState } from "./computerCardInfo/ComputerState"
 import ComputerStateInfo from "./computerCardInfo/ComputerStateInfo"
 import Modal from "./scheduleForm/Modal"
 // import ScheduleForm, { ScheduleFormData } from "./scheduleForm/ScheduleForm"
 import PowerControlForm from './PowerControlForm'
 
-export default function ComputerCard({ stationId, state }: { stationId: string, state: ComputerState }) {
+export default function ComputerCard({ stationId }: { stationId: string }) {
   const [isModalOpen, setIsModalOpen] = useState(false)
   // const [isSubmitting, setIsSubmitting] = useState(false)
   const [submitError, setSubmitError] = useState<string | null>(null)
@@ -70,7 +69,9 @@ export default function ComputerCard({ stationId, state }: { stationId: string, 
           <CardBody className="h-full flex items-center justify-center">
           </CardBody>
           <CardFooter className="flex items-center justify-center">
-            <ComputerStateInfo state={state} />
+            <Suspense fallback={<div>Loading...</div>}>
+              <ComputerStateInfo stationId={stationId} />
+            </Suspense>
           </CardFooter>
         </Card>
       </div>

@@ -2,8 +2,7 @@ import ComputerCard from "@/components/ComputerCard";
 import UserPhoto from "@/components/UserPhoto";
 import LogoutButton from "@/components/LogoutButton";
 import { ComputerStations } from "@/constants/ComputerStations";
-import { getStationsData } from "@/utils/getStationsData";
-import { ComputerState } from "@/components/computerCardInfo/ComputerState";
+import { DecToHex } from "@/utils/DecToHex";
 
 export default async function Home() {
 
@@ -13,8 +12,6 @@ export default async function Home() {
   const lastItemsStartColumn = remainingItems === 1 ? 'col-start-4' :
                                 remainingItems === 2 ? 'col-start-3' :
                                 remainingItems === 3 ? 'col-start-2' : '';
-
-  const machineData = await getStationsData();
 
   return (
     <div className="flex flex-col h-screen">
@@ -36,7 +33,7 @@ export default async function Home() {
               key={station}
               className={`col-span-2 ${index === totalStations - remainingItems ? lastItemsStartColumn : ''}`}
             >
-              <ComputerCard stationId={machineData[index].stationId} state={machineData[index].status.toUpperCase() as ComputerState}/>
+              <ComputerCard stationId={DecToHex(station)} />
             </div>
           ))}
         </div>

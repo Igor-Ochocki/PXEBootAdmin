@@ -14,7 +14,7 @@
     "@heroui/react": "^2.7.5",
     "@mui/icons-material": "^6.4.7",
     "@mui/material": "^6.4.7",
-    "amt-manager-test": "^0.0.1",
+    "amt-manager-test": "^0.0.2",
     "cheerio": "^1.0.0",
     "dotenv": "^16.4.7",
     "framer-motion": "^12.5.0",

@@ -48,7 +48,6 @@ export default function ScheduleForm({ onSubmit, onCancel, stationId }: Schedule
     const fetchUserData = async () => {
       try {
         const response = await fetch('/api/user')
-        console.log('Fetching user data...')
         if (response.ok) {
           const data = await response.json()
           setFormData(prev => ({ ...prev, id: data.id }))

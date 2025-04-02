@@ -7,8 +7,6 @@ export async function POST(request: Request) {
     config();
     const { stationId, action } = await request.json();
 
-    console.log(stationId, action);
-
     if (!stationId || !action) {
       return NextResponse.json(
         { error: 'Missing required parameters' },

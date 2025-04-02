@@ -12,14 +12,6 @@ export async function GET(request: NextRequest) {
 
     const callbackUrl = `${hostUrl}/api/auth/callback?host=${hostUrl}`;
 
-    // Log the configuration (without sensitive data)
-    console.log('USOS Configuration:', {
-      baseUrl: USOS_CONFIG.baseUrl,
-      callbackUrl: callbackUrl,
-      consumerKey: USOS_CONFIG.consumerKey,
-      scopes: USOS_CONFIG.scopes
-    });
-
     const requestParams = {
       oauth_callback: callbackUrl,
       scopes: USOS_CONFIG.scopes
@@ -32,9 +24,6 @@ export async function GET(request: NextRequest) {
       USOS_CONFIG.consumerKey,
       USOS_CONFIG.consumerSecret
     );
-
-    console.log('Request URL:', requestTokenUrl);
-    console.log('Auth Header:', authHeader);
 
     const usosResponse = await fetch(requestTokenUrl, {
       headers: {
@@ -53,7 +42,6 @@ export async function GET(request: NextRequest) {
     }
 
     const responseData = await usosResponse.text();
-    console.log('USOS Response:', responseData);
 
     const responseParams = new URLSearchParams(responseData);
     const oauthToken = responseParams.get('oauth_token');

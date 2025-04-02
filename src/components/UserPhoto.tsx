@@ -29,7 +29,6 @@ export default function UserPhoto() {
         }
 
         const data = await response.json();
-        console.log('User data received:', data);
 
         if (data.photo_urls) {
           const firstKey = Object.keys(data.photo_urls)[0];
