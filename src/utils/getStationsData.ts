@@ -69,7 +69,7 @@ export async function getStationsData(): Promise<StationData[]> {
           password: process.env.AMT_PASSWORD || 'password',
           protocol: 'http',
           timeout: 10000,
-          retries: 3,
+          retries: 1,
           verifySSL: true,
           forceIPv4: true
         });

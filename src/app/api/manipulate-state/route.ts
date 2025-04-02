@@ -1,8 +1,9 @@
 import { AMTManager } from 'amt-manager-test';
-import { NextResponse } from 'next/server';
+import { NextResponse, NextRequest } from 'next/server';
 import { config } from 'dotenv';
+import { getUserStatus } from '@/utils/userFieldsFetch';
 
-export async function POST(request: Request) {
+export async function POST(request: NextRequest) {
   try {
     config();
     const { stationId, action } = await request.json();
@@ -11,6 +12,15 @@ export async function POST(request: Request) {
       return NextResponse.json(
         { error: 'Missing required parameters' },
         { status: 400 }
+      );
+    }
+
+    const userStatus = await getUserStatus(request);
+
+    if (userStatus.status !== 200) {
+      return NextResponse.json(
+        { error: 'User is not an active student' },
+        { status: 403 }
       );
     }
 
