@@ -49,27 +49,23 @@ export async function initDB() {
         )
     `);
 
-    return db;
-}
-
-// Create a new table for schedules
-export async function createSchedulesTable() {
-    const db = await initDB();
     await db.exec(`
-        CREATE TABLE IF NOT EXISTS Schedules (
-            id INTEGER PRIMARY KEY AUTOINCREMENT,
-            userId TEXT NOT NULL,
-            stationId TEXT NOT NULL,
-            startDate DATETIME NOT NULL,
-            startTime DATETIME NOT NULL,
-            duration INTEGER NOT NULL,
-            operatingSystem TEXT NOT NULL,
-            subSystem TEXT NOT NULL,
-            jobId TEXT NOT NULL,
-            FOREIGN KEY (operatingSystem) REFERENCES OperatingSystems(code),
-            FOREIGN KEY (subSystem) REFERENCES SubSystems(code)
-        )
+      CREATE TABLE IF NOT EXISTS Schedules (
+          id INTEGER PRIMARY KEY AUTOINCREMENT,
+          userId TEXT NOT NULL,
+          stationId TEXT NOT NULL,
+          startDate DATETIME NOT NULL,
+          startTime DATETIME NOT NULL,
+          duration INTEGER NOT NULL,
+          operatingSystem TEXT NOT NULL,
+          subSystem TEXT,
+          jobId TEXT NOT NULL,
+          FOREIGN KEY (operatingSystem) REFERENCES OperatingSystems(code),
+          FOREIGN KEY (subSystem) REFERENCES SubSystems(code)
+      )
     `);
+
+    return db;
 }
 
 // Add a schedule to the database
