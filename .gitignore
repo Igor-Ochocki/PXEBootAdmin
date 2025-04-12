@@ -44,4 +44,5 @@ next-env.d.ts
 *.sh
 
 # local data
-/data/*
+/data
+*.db

@@ -15,15 +15,13 @@ export async function scheduleTask({
   stationId,
   startDate,
   startTime,
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   systemCode
 }: ScheduleTaskParams): Promise<string> {
   try {
     config();
     // Construct the command to execute
-    const command = `echo 'amt-manager powerOn ${stationId} ${process.env.AMT_USERNAME} ${process.env.AMT_PASSWORD}' > /tmp/test`;
+    const command = `echo 'create-station-symlink ${stationId} ${systemCode} && amt-manager powerOn ${stationId} ${process.env.AMT_USERNAME} ${process.env.AMT_PASSWORD}' > /tmp/test`;
 
-    console.log(`./schedule-task -c "${command}" -d ${startDate} -t ${startTime}`);
     // Execute the schedule-task.sh script
     const { stdout, stderr } = await execAsync(
       `./schedule-task -c "${command}" -d ${startDate} -t ${startTime}`

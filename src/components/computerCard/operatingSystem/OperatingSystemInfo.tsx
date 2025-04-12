@@ -1,8 +1,6 @@
 import { useState, useEffect } from 'react';
-import { getMachineOperatingSystem } from '@/utils/getMachineOperatingSystem';
 import { createPortal } from 'react-dom';
 import OperatingSystemForm from './OperatingSystemForm';
-
 interface OperatingSystem {
   id: number;
   code: string;
@@ -20,8 +18,11 @@ export default function OperatingSystemInfo({ stationId }: { stationId: string }
 
   useEffect(() => {
     const fetchOperatingSystem = async () => {
-      const os = await getMachineOperatingSystem(stationId);
-      setOperatingSystem(os);
+      const os = await fetch(`/api/machine/os?stationId=s${stationId}`);
+      if (os.ok) {
+        const data = await os.json();
+        setOperatingSystem(data);
+      }
       setIsLoading(false);
     };
 
@@ -100,7 +101,7 @@ export default function OperatingSystemInfo({ stationId }: { stationId: string }
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({
-          stationId,
+          stationId: `s${stationId}`,
           operatingSystem: os,
           subSystem,
         }),
@@ -123,7 +124,7 @@ export default function OperatingSystemInfo({ stationId }: { stationId: string }
   return (
     <>
       <div className="flex items-center gap-2">
-        <div>
+        <div className="overflow-hidden">
           <h1 className="text-quinary font-medium">{operatingSystem}</h1>
           {subSystem && (
             <p className="text-quinary/80 text-sm">{subSystem}</p>

@@ -4,10 +4,11 @@ import { initDB } from '@/lib/utils/db';
 export async function GET(request: NextRequest) {
   try {
     const db = await initDB();
-    const data = await request.json();
+    const { searchParams } = new URL(request.url);
+    const os = searchParams.get('os');
     const subsystems = await db.all(
       'SELECT * FROM SubSystems WHERE operatingSystemId = (SELECT id FROM OperatingSystems WHERE code = ?)',
-      [data.os]
+      [os]
     );
     await db.close();
     return NextResponse.json(subsystems);

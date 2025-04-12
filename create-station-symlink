@@ -1,0 +1,48 @@
+#!/bin/bash
+
+# Function to print colored output
+print_status() {
+    echo -e "\033[1;32m[STATUS]\033[0m $1"
+}
+
+print_error() {
+    echo -e "\033[1;31m[ERROR]\033[0m $1"
+}
+
+# Check if running as root
+if [ "$EUID" -ne 0 ]; then
+    print_error "This script must be run as root"
+    exit 1
+fi
+
+# Check if both arguments are provided
+if [ $# -ne 2 ]; then
+    print_error "Usage: $0 <stationId> <systemCode>"
+    print_error "Example: $0 station1 linux-ubuntu"
+    exit 1
+fi
+
+STATION_ID=$1
+SYSTEM_CODE=$2
+OPT_DIR="/opt/stations"
+TARGET_DIR="$OPT_DIR/$STATION_ID"
+LINK_NAME="$SYSTEM_CODE"
+
+# Check if /opt/stations directory exists
+if [ ! -d "$OPT_DIR/stations" ]; then
+    print_status "Creating directory $OPT_DIR/stations"
+    mkdir -p $OPT_DIR
+fi
+
+# Check if link exists
+if [ -L $TARGET_DIR ]; then
+    print_status "Removing link from $TARGET_DIR"
+    rm $TARGET_DIR
+fi
+
+# Create the symlink
+print_status "Creating symlink from $LINK_NAME to $TARGET_DIR"
+ln -s "$LINK_NAME" "$TARGET_DIR"
+
+print_status "Symlink created successfully:"
+ls -l "$TARGET_DIR"

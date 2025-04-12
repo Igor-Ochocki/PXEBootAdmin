@@ -71,7 +71,7 @@ export default function OperatingSystemForm({
 
       setIsLoadingSubSystems(true);
       try {
-        const response = await fetch(`/api/operating-system/${selectedOS}/subsystems`);
+        const response = await fetch(`/api/operating-system/subsystems?os=${selectedOS}`);
         if (response.ok) {
           const data = await response.json();
           setSubSystems(data);
@@ -166,7 +166,7 @@ export default function OperatingSystemForm({
             </button>
             <button
               onClick={handleSubmit}
-              disabled={!selectedOS || !selectedSubSystem || isLoadingSubSystems}
+              disabled={!selectedOS || isLoadingSubSystems}
               className="px-4 py-2 bg-quaternary text-primary rounded-md hover:bg-quaternary/80 transition-colors focus:outline-none focus:ring-2 focus:ring-quaternary disabled:opacity-50 disabled:cursor-not-allowed"
               aria-label="Save changes"
             >

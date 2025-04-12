@@ -1,0 +1,41 @@
+#!/bin/bash
+
+# Function to print colored output
+print_status() {
+    echo -e "\033[1;32m[STATUS]\033[0m $1"
+}
+
+print_error() {
+    echo -e "\033[1;31m[ERROR]\033[0m $1"
+}
+
+# Check if running as root
+if [ "$EUID" -ne 0 ]; then
+    print_error "This script must be run as root"
+    exit 1
+fi
+
+# Check if argument is provided
+if [ $# -ne 1 ]; then
+    print_error "Usage: $0 <stationId>"
+    print_error "Example: $0 station1"
+    exit 1
+fi
+
+STATION_ID=$1
+OPT_DIR="/opt/stations"
+TARGET_DIR="$OPT_DIR/$STATION_ID"
+
+# Check if station directory exists
+if [ ! -L "$TARGET_DIR" ]; then
+    print_error "Station directory $TARGET_DIR does not exist"
+    exit 1
+fi
+
+# Find symlink pointing to the station
+# Get the target of the symlink
+LINK_TARGET=$(readlink -f "$TARGET_DIR")
+
+# Extract the system code from the target path
+SYSTEM_CODE=$(basename "$LINK_TARGET")
+echo "$SYSTEM_CODE"

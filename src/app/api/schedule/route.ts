@@ -36,7 +36,7 @@ export async function POST(request: NextRequest) {
       stationId: data.stationId,
       startDate: data.startDate,
       startTime: data.startTime,
-      systemCode: `${data.operatingSystem} ${data.subSystem}`
+      systemCode: `'${data.operatingSystem} ${data.subSystem}'`
     });
 
     // Add the schedule to the database
