@@ -4,7 +4,9 @@ import type { NextRequest } from 'next/server'
 export function middleware(request: NextRequest) {
   const accessToken = request.cookies.get('access_token')
   const isAuthPage = request.nextUrl.pathname.startsWith('/auth')
-  const isProtectedApi = request.nextUrl.pathname.startsWith('/api/schedule')
+  const isUserApi = request.nextUrl.pathname.startsWith('/api/user')
+  const isAuthApi = request.nextUrl.pathname.startsWith('/api/auth')
+  const isProtectedApi = !isAuthPage && !isUserApi && !isAuthApi && request.nextUrl.pathname.startsWith('/api')
 
   // If trying to access protected routes or APIs without auth, redirect to login or return 401
   if (!accessToken && (isProtectedApi || (!isAuthPage && !request.nextUrl.pathname.startsWith('/api')))) {

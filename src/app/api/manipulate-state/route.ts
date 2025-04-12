@@ -3,6 +3,7 @@ import { NextResponse, NextRequest } from 'next/server';
 import { config } from 'dotenv';
 import { getUserId, getUserStatus } from '@/utils/userFieldsFetch';
 import { logAction } from '@/lib/utils/db';
+import { revalidatePath } from 'next/cache';
 
 export async function POST(request: NextRequest) {
   try {
@@ -75,6 +76,7 @@ export async function POST(request: NextRequest) {
     // Log the action to the database
     await logAction(userId, action, stationId);
 
+    revalidatePath('/');
     return NextResponse.json({ success: result });
   } catch (error) {
     console.error('Error in manipulate-state:', error);

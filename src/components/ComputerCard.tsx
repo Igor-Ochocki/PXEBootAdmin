@@ -6,7 +6,7 @@ import ComputerStateInfo from "./computerCardInfo/ComputerStateInfo"
 import Modal from "./scheduleForm/Modal"
 // import ScheduleForm, { ScheduleFormData } from "./scheduleForm/ScheduleForm"
 import PowerControlForm from './PowerControlForm'
-
+import OperatingSystemInfo from './computerCard/operatingSystem/OperatingSystemInfo'
 export default function ComputerCard({ stationId }: { stationId: string }) {
   const [isModalOpen, setIsModalOpen] = useState(false)
   // const [isSubmitting, setIsSubmitting] = useState(false)
@@ -67,6 +67,7 @@ export default function ComputerCard({ stationId }: { stationId: string }) {
               <p className="text-quinary font-medium text-lg">s{stationId}</p>
           </CardHeader>
           <CardBody className="h-full flex items-center justify-center">
+            <OperatingSystemInfo stationId={stationId} />
           </CardBody>
           <CardFooter className="flex items-center justify-center">
             <Suspense fallback={<div>Loading...</div>}>
