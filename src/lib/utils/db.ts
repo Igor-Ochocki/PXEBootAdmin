@@ -52,6 +52,34 @@ export async function initDB() {
     return db;
 }
 
+// Create a new table for schedules
+export async function createSchedulesTable() {
+    const db = await initDB();
+    await db.exec(`
+        CREATE TABLE IF NOT EXISTS Schedules (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            userId TEXT NOT NULL,
+            stationId TEXT NOT NULL,
+            startDate DATETIME NOT NULL,
+            startTime DATETIME NOT NULL,
+            duration INTEGER NOT NULL,
+            operatingSystem TEXT NOT NULL,
+            subSystem TEXT NOT NULL,
+            jobId TEXT NOT NULL,
+            FOREIGN KEY (operatingSystem) REFERENCES OperatingSystems(code),
+            FOREIGN KEY (subSystem) REFERENCES SubSystems(code)
+        )
+    `);
+}
+
+// Add a schedule to the database
+export async function addSchedule(userId: string, stationId: string, startDate: string, startTime: string, duration: number, operatingSystem: string, subSystem: string, jobId: string) {
+    const db = await initDB();
+    await db.run(
+        'INSERT INTO Schedules (userId, stationId, startDate, startTime, duration, operatingSystem, subSystem, jobId) VALUES (?, ?, ?, ?, ?, ?, ?, ?)',
+        [userId, stationId, startDate, startTime, duration, operatingSystem, subSystem, jobId]
+    );
+}
 // Log an action
 export async function logAction(userId: string, action: string, stationId: string) {
     const db = await initDB();

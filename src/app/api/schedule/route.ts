@@ -1,10 +1,8 @@
+import { addSchedule } from '@/lib/utils/db';
+import { scheduleTask } from '@/utils/scheduleTask';
 import { NextRequest, NextResponse } from 'next/server';
 
 export async function POST(request: NextRequest) {
-  return NextResponse.json({
-    success: true,
-    message: 'Schedule submitted successfully'
-  });
   try {
     const accessToken = request.cookies.get('access_token')?.value;
     const accessTokenSecret = request.cookies.get('access_token_secret')?.value;
@@ -33,23 +31,22 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // Log the data to the server console
-    console.log('Schedule form submission received:');
-    console.log('Station ID:', data.stationId);
-    console.log('Start Date:', data.startDate);
-    console.log('Start Time:', data.startTime);
-    console.log('Duration:', data.duration);
-    console.log('Operating System:', data.operatingSystem);
-    console.log('User ID:', data.id);
-    console.log('-----------------------------------');
+    // Schedule the task and capture job_id
+    const jobId = await scheduleTask({
+      stationId: data.stationId,
+      startDate: data.startDate,
+      startTime: data.startTime,
+      systemCode: `${data.operatingSystem} ${data.subSystem}`
+    });
 
-    // TODO: Add your scheduling logic here
-    // For example, saving to a database, checking for conflicts, etc.
+    // Add the schedule to the database
+    await addSchedule(data.id, data.stationId, data.startDate, data.startTime, data.duration, data.operatingSystem, data.subSystem, jobId);
 
     // Return a success response
     return NextResponse.json({
       success: true,
-      message: 'Schedule submitted successfully'
+      message: 'Schedule submitted successfully',
+      jobId
     });
   } catch (error) {
     console.error('Error processing schedule submission:', error);

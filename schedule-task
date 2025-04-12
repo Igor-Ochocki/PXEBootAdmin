@@ -1,0 +1,88 @@
+#!/bin/sh
+
+# Colors for output
+GREEN='\033[0;32m'
+RED='\033[0;31m'
+NC='\033[0m'
+
+# Function to print status messages
+print_status() {
+  printf "${GREEN}[✓]${NC} %s\n" "$1"
+}
+
+# Function to print error messages
+print_error() {
+  printf "${RED}[✗]${NC} %s\n" "$1"
+}
+
+# Function to show usage
+show_usage() {
+  echo "Usage: $0 -c \"command\" -d YYYY-MM-DD -t HH:MM"
+  echo "Example: $0 -c \"echo 'Hello World'\" -d 2024-03-20 -t 14:30"
+  exit 1
+}
+
+# Parse command line arguments
+while getopts "c:d:t:" opt; do
+  case $opt in
+    c) command="$OPTARG" ;;
+    d) date="$OPTARG" ;;
+    t) time="$OPTARG" ;;
+    *) show_usage ;;
+  esac
+done
+
+# Check if all required arguments are provided
+if [ -z "$command" ] || [ -z "$date" ] || [ -z "$time" ]; then
+  print_error "Missing required arguments"
+  show_usage
+fi
+
+# Check if at command is installed
+if ! command -v at >/dev/null 2>&1; then
+  print_error "The 'at' command is not installed. Installing..."
+  if command -v apt-get >/dev/null 2>&1; then
+    sudo apt-get update && sudo apt-get install -y at
+  elif command -v yum >/dev/null 2>&1; then
+    sudo yum install -y at
+  elif command -v pacman >/dev/null 2>&1; then
+    sudo pacman -S --noconfirm at
+  else
+    print_error "Could not install 'at' command. Please install it manually."
+    exit 1
+  fi
+fi
+
+# Check if atd service is running
+if ! systemctl is-active --quiet atd 2>/dev/null; then
+  print_status "Starting atd service..."
+  sudo systemctl start atd
+  sudo systemctl enable atd
+fi
+
+# Validate date format
+if ! date -d "$date" >/dev/null 2>&1; then
+  print_error "Invalid date format. Please use YYYY-MM-DD"
+  exit 1
+fi
+
+# Validate time format
+if ! echo "$time" | grep -q '^\([0-1][0-9]\|2[0-3]\):[0-5][0-9]$'; then
+  print_error "Invalid time format. Please use HH:MM in 24-hour format"
+  exit 1
+fi
+
+# Schedule the task and capture job_id
+job_id=$(echo "$command" | at "$time" "$date" 2>&1 | sed -n 's/.*job \([0-9]\+\).*/\1/p')
+
+if [ -n "$job_id" ]; then
+  print_status "Task scheduled successfully with job ID: $job_id"
+  print_status "To view scheduled tasks, run: atq"
+  print_status "To remove this task, run: atrm $job_id"
+  print_status "To view the scheduled command, run: at -c $job_id"
+  # Output job_id in a parseable format
+  echo "JOB_ID=$job_id"
+else
+  print_error "Failed to schedule task"
+  exit 1
+fi

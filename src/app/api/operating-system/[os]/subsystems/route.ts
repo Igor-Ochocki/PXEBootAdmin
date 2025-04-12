@@ -1,15 +1,13 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { initDB } from '@/lib/utils/db';
 
-export async function GET(
-  request: NextRequest,
-  { params }: { params: { os: string } }
-) {
+export async function GET(request: NextRequest) {
   try {
     const db = await initDB();
+    const data = await request.json();
     const subsystems = await db.all(
       'SELECT * FROM SubSystems WHERE operatingSystemId = (SELECT id FROM OperatingSystems WHERE code = ?)',
-      [params.os]
+      [data.os]
     );
     await db.close();
     return NextResponse.json(subsystems);
