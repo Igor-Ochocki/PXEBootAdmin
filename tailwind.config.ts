@@ -26,4 +26,4 @@ const config: Config = {
     plugins: [heroui()],
 };
 
-export default config; 
+export default config;

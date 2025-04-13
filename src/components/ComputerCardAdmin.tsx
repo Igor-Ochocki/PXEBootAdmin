@@ -4,50 +4,20 @@ import { Suspense, useState } from 'react'
 import { Card, CardBody, CardFooter, CardHeader } from "@heroui/react"
 import ComputerStateInfo from "./computerCardInfo/ComputerStateInfo"
 import Modal from "./scheduleForm/Modal"
-import ScheduleForm, { ScheduleFormData } from "./scheduleForm/ScheduleForm"
+import PowerControlForm from './PowerControlForm'
 import OperatingSystemInfo from './computerCard/operatingSystem/OperatingSystemInfo'
-
-export default function ComputerCard({ stationId }: { stationId: string }) {
+export default function ComputerCardAdmin({ stationId }: { stationId: string }) {
   const [isModalOpen, setIsModalOpen] = useState(false)
-  const [isSubmitting, setIsSubmitting] = useState(false)
+  const [submitError, setSubmitError] = useState<string | null>(null)
 
   const handleCardClick = () => {
     setIsModalOpen(true)
+    setSubmitError(null)
   }
 
   const handleCloseModal = () => {
-    if (isSubmitting) return; // Prevent closing while submitting
     setIsModalOpen(false)
-  }
-
-  const handleScheduleSubmit = async (formData: ScheduleFormData) => {
-    try {
-      setIsSubmitting(true)
-
-      // Send the data to the API endpoint
-      const response = await fetch('/api/schedule', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          ...formData
-        }),
-      })
-
-      const result = await response.json()
-
-      if (!response.ok || !result.success) {
-        throw new Error(result.error || 'Failed to submit schedule')
-      }
-
-      console.log('Schedule submitted successfully:', result)
-      setIsModalOpen(false)
-    } catch (error) {
-      console.error('Error submitting schedule:', error)
-    } finally {
-      setIsSubmitting(false)
-    }
+    setSubmitError(null)
   }
 
   return (
@@ -73,22 +43,17 @@ export default function ComputerCard({ stationId }: { stationId: string }) {
       </div>
 
       <Modal isOpen={isModalOpen} onClose={handleCloseModal}>
-        <div className="w-full flex justify-center">
-          <ScheduleForm
-            stationId={stationId}
-            onSubmit={handleScheduleSubmit}
-            onCancel={isSubmitting ? undefined : handleCloseModal}
-          />
-          {/* <PowerControlForm
+        <div className="w-full max-w-md">
+          {submitError && (
+            <div className="mb-4 p-3 bg-red-500/20 border border-red-500 rounded-lg text-red-500">
+              {submitError}
+            </div>
+          )}
+          <PowerControlForm
             stationId={stationId}
             isOpen={isModalOpen}
             onClose={handleCloseModal}
-          /> */}
-          {isSubmitting && (
-            <div className="absolute inset-0 bg-black/30 rounded-xl flex items-center justify-center">
-              <div className="animate-pulse text-quaternary font-bold">Submitting...</div>
-            </div>
-          )}
+          />
         </div>
       </Modal>
     </>

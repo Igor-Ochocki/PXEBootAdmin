@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { useSchedules } from '@/hooks/useSchedules';
 import { format, parseISO, addMinutes, startOfWeek, addDays, addWeeks, subWeeks } from 'date-fns';
+import { Button } from '@heroui/react';
 
 interface ScheduleCalendarProps {
   stationId: string;
@@ -8,18 +9,21 @@ interface ScheduleCalendarProps {
 }
 
 interface ScheduleBlock {
+  id: number;
   start: Date;
   end: Date;
   operatingSystemName: string;
   subSystemName: string | null;
+  jobId: number;
 }
 
-export function ScheduleCalendar({ stationId, onClose }: ScheduleCalendarProps) {
+export function ScheduleCalendarAdmin({ stationId, onClose }: ScheduleCalendarProps) {
   const [currentWeek, setCurrentWeek] = useState<Date>(startOfWeek(new Date(), { weekStartsOn: 1 }));
   const { schedules, loading, error } = useSchedules({
     stationId: `s${stationId}`,
     startDate: format(currentWeek, 'yyyy-MM-dd')
   });
+  const [deletedSchedules, setDeletedSchedules] = useState<number[] | null>(null);
 
   const weekDays = Array.from({ length: 7 }, (_, i) => addDays(currentWeek, i));
 
@@ -39,6 +43,9 @@ export function ScheduleCalendar({ stationId, onClose }: ScheduleCalendarProps) 
 
   const getScheduleBlocks = (date: Date) => {
     const daySchedules = schedules.filter(schedule => {
+      if (deletedSchedules && deletedSchedules.includes(schedule.id)) {
+        return false;
+      }
       const scheduleDate = parseISO(schedule.startDate);
       const scheduleEndDate = addMinutes(parseISO(`${schedule.startDate}T${schedule.startTime}`), schedule.duration);
 
@@ -80,6 +87,8 @@ export function ScheduleCalendar({ stationId, onClose }: ScheduleCalendarProps) 
       }
 
       return {
+        id: schedule.id,
+        jobId: schedule.jobId,
         start,
         end,
         operatingSystemName: schedule.operatingSystemName,
@@ -90,6 +99,20 @@ export function ScheduleCalendar({ stationId, onClose }: ScheduleCalendarProps) 
         isStartDay
       };
     });
+  };
+
+  const handleDeleteSchedule = async (id: number, jobId: number) => {
+    try {
+      const response = await fetch(`/api/admin/schedules?id=${id}&jobId=${jobId}`, {
+        method: 'DELETE',
+      });
+      if (!response.ok) {
+        throw new Error('Failed to delete schedule');
+      }
+      setDeletedSchedules(prev => [...(prev || []), id]);
+    } catch (error) {
+      console.error('Error deleting schedule:', error);
+    }
   };
 
   const renderScheduleBlock = (block: ScheduleBlock & { top: string; height: string; isOvernight: boolean; isStartDay: boolean }) => {
@@ -112,6 +135,20 @@ export function ScheduleCalendar({ stationId, onClose }: ScheduleCalendarProps) 
           {block.operatingSystemName}
           {block.subSystemName && ` - ${block.subSystemName}`}
         </div>
+        <Button
+          onPress={() => {
+            handleDeleteSchedule(block.id, block.jobId);
+          }}
+          className="absolute bottom-1 right-1 p-1"
+          variant="ghost"
+          color="danger"
+          size="md"
+          aria-label="Delete schedule"
+        >
+          <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" viewBox="0 0 20 20" fill="red">
+            <path fillRule="evenodd" d="M9 2a1 1 0 00-.894.553L7.382 4H4a1 1 0 000 2v10a2 2 0 002 2h8a2 2 0 002-2V6a1 1 0 100-2h-3.382l-.724-1.447A1 1 0 0011 2H9zM7 8a1 1 0 012 0v6a1 1 0 11-2 0V8zm5-1a1 1 0 00-1 1v6a1 1 0 102 0V8a1 1 0 00-1-1z" clipRule="evenodd" />
+          </svg>
+        </Button>
       </div>
     );
   };
@@ -173,7 +210,7 @@ export function ScheduleCalendar({ stationId, onClose }: ScheduleCalendarProps) 
             </div>
 
             {/* Calendar Grid */}
-            <div className="flex-1 overflow-x-auto no-scrollbar">
+            <div className="flex-1">
               <div className="grid grid-cols-7 sm:grid-cols-7 md:grid-cols-7 lg:grid-cols-7 divide-x divide-quaternary w-full min-w-[800px]">
                 {weekDays.map((day) => (
                   <div key={day.toISOString()} className="flex flex-col">

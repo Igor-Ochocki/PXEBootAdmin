@@ -47,6 +47,17 @@ export async function populateTestSchedules() {
         subSystem: 'arch-desktop',
         jobId: 'j1'
       },
+
+      {
+        stationId: 's1',
+        userId: 'u1',
+        startDate: formatDate(today),
+        startTime: '11:17',
+        duration: 106, // 1 hour 46 minutes
+        operatingSystem: 'ubuntu',
+        subSystem: 'gnome',
+        jobId: 'j1'
+      },
       {
         stationId: 's1',
         userId: 'u1',

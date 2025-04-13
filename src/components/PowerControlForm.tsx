@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { Button, Dialog, DialogTitle, DialogContent, DialogActions } from '@mui/material';
 import { PowerSettingsNew, PowerOff, Refresh, Close } from '@mui/icons-material';
+import { ScheduleCalendarAdmin } from './calendar/ScheduleCalendarAdmin';
 
 interface PowerControlFormProps {
   stationId: string;
@@ -10,6 +11,7 @@ interface PowerControlFormProps {
 
 export default function PowerControlForm({ stationId, isOpen, onClose }: PowerControlFormProps) {
   const [isLoading, setIsLoading] = useState(false);
+  const [showCalendar, setShowCalendar] = useState(false);
 
   const handlePowerAction = async (action: 'powerOn' | 'powerOff' | 'reset') => {
     try {
@@ -75,6 +77,29 @@ export default function PowerControlForm({ stationId, isOpen, onClose }: PowerCo
           >
             Reset
           </Button>
+          <div>
+            <div className="w-full flex justify-center">
+              <Button
+                variant="outlined"
+                type="button"
+                onClick={() => setShowCalendar(!showCalendar)}
+                className={`border border-quaternary rounded-full px-4 py-2
+                          transition-all duration-300 ease-in-out
+                          hover:bg-blue-500 hover:text-white hover:border-blue-500
+                          active:bg-blue-700 active:scale-95
+                          ${showCalendar ? 'bg-blue-500 text-white' : 'text-blue-500'}`}
+              >
+                {showCalendar ? 'Hide Schedule' : 'View Schedule'}
+              </Button>
+            </div>
+
+            {showCalendar && (
+              <ScheduleCalendarAdmin
+                stationId={stationId}
+                onClose={() => setShowCalendar(false)}
+              />
+            )}
+          </div>
         </div>
       </DialogContent>
       <DialogActions>

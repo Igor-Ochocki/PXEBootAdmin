@@ -1,5 +1,5 @@
 import { addSchedule } from '@/lib/utils/db';
-import { scheduleTask } from '@/utils/scheduleTask';
+import { getOverlappingSchedule, scheduleTask } from '@/utils/scheduleTask';
 import { NextRequest, NextResponse } from 'next/server';
 
 export async function POST(request: NextRequest) {
@@ -31,6 +31,19 @@ export async function POST(request: NextRequest) {
       );
     }
 
+    // Check if the station is already scheduled for overlapping time
+    const overlappingSchedule = await getOverlappingSchedule({
+      stationId: data.stationId,
+      startDate: data.startDate,
+      startTime: data.startTime,
+      duration: data.duration
+    });
+    if (overlappingSchedule) {
+      return NextResponse.json(
+        { error: 'Station is already scheduled for overlapping time' },
+        { status: 400 }
+      );
+    }
     // Schedule the task and capture job_id
     const jobId = await scheduleTask({
       stationId: data.stationId,
@@ -39,8 +52,11 @@ export async function POST(request: NextRequest) {
       systemCode: `'${data.operatingSystem} ${data.subSystem}'`
     });
 
+    const hours = data.duration.split(':')[0];
+    const minutes = data.duration.split(':')[1];
+    const durationInMinutes = parseInt(hours) * 60 + parseInt(minutes);
     // Add the schedule to the database
-    await addSchedule(data.id, data.stationId, data.startDate, data.startTime, data.duration, data.operatingSystem, data.subSystem, jobId);
+    await addSchedule(data.id, data.stationId, data.startDate, data.startTime, durationInMinutes, data.operatingSystem, data.subSystem, parseInt(jobId));
 
     // Return a success response
     return NextResponse.json({

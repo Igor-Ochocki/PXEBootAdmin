@@ -132,8 +132,8 @@ export default function ScheduleForm({ onSubmit, onCancel, stationId }: Schedule
   }
 
   return (
-    <div className="flex flex-col space-y-4">
-      <Card className="w-[20vw] max-w-md mx-auto border-quaternary border-2 rounded-xl">
+    <div className="w-[75vw] md:w-[60vw] lg:w-[30vw] flex flex-col space-y-4 justify-center">
+      <Card className="border-quaternary border-2 rounded-xl">
         <CardHeader className="bg-primary p-4 rounded-t-xl">
           <h2 className="text-quinary text-xl font-bold">Schedule station {stationId} time</h2>
         </CardHeader>
@@ -225,6 +225,12 @@ export default function ScheduleForm({ onSubmit, onCancel, stationId }: Schedule
                 disabled={isLoadingSubSystems || !formData.operatingSystem}
                 className="w-full p-2 border border-quaternary rounded-md bg-primary text-quinary disabled:opacity-50 disabled:cursor-not-allowed"
               >
+                {operatingSystems.length > 0 && (
+                  <>
+                    <option value="ff" disabled>Select operating system</option>
+                    <option value="">None</option>
+                  </>
+                )}
                 {isLoadingSubSystems ? (
                   <option value="">Loading subsystems...</option>
                 ) : subSystems.length > 0 ? (

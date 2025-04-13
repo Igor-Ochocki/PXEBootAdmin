@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 
 interface Schedule {
-  id: string;
+  id: number;
   stationId: string;
   startDate: string;
   startTime: string;
@@ -9,6 +9,7 @@ interface Schedule {
   operatingSystemName: string;
   operatingSystemCode: string;
   subSystemName: string | null;
+  jobId: number;
 }
 
 interface UseSchedulesProps {

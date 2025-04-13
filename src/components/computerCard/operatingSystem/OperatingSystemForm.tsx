@@ -118,6 +118,7 @@ export default function OperatingSystemForm({
               className="w-full p-2 border border-quaternary rounded-md bg-primary text-quinary focus:outline-none focus:ring-2 focus:ring-quaternary"
               aria-label="Select operating system"
             >
+              <option value="" disabled>Select operating system</option>
               {operatingSystems.map((os) => (
                 <option key={os.id} value={os.code}>
                   {os.name}
@@ -142,6 +143,9 @@ export default function OperatingSystemForm({
               className="w-full p-2 border border-quaternary rounded-md bg-primary text-quinary focus:outline-none focus:ring-2 focus:ring-quaternary disabled:opacity-50 disabled:cursor-not-allowed"
               aria-label="Select subsystem"
             >
+              {operatingSystems.length > 0 && (
+                <option value="">None</option>
+              )}
               {isLoadingSubSystems ? (
                 <option value="">Loading subsystems...</option>
               ) : subSystems.length > 0 ? (

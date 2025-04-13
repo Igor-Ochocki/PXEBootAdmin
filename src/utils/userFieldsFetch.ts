@@ -1,4 +1,5 @@
 import { USOS_CONFIG } from '@/config/usos';
+import { getAdmins } from '@/lib/utils/db';
 import { getAuthorizationHeader } from '@/utils/oauth';
 import { NextResponse, NextRequest } from 'next/server';
 
@@ -57,6 +58,14 @@ export const fetchUserFields = async (params: FetchUsedFieldsParams) => {
 
     const userData = await response.json();
     return userData;
+}
+
+export const isUserAdmin = async (request: NextRequest) => {
+  const res = await getUserId(request)
+  const data = await res.json();
+  const userId = data.id;
+  const admins = await getAdmins()
+  return admins.some(admin => admin.userId === userId)
 }
 
 export const getUserId = async (request: NextRequest) => {
