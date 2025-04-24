@@ -1,48 +1,37 @@
-#!/bin/bash
+#!/bin/sh
+# create-station-symlink - Create a symlink for a station
+# ochockii 2025
 
-# Function to print colored output
+OPT_DIR="/opt/stations"
+
 print_status() {
-    echo -e "\033[1;32m[STATUS]\033[0m $1"
+  echo -e "\033[1;32m[STATUS]\033[0m $1"
 }
 
 print_error() {
-    echo -e "\033[1;31m[ERROR]\033[0m $1"
+  echo -e "\033[1;31m[ERROR]\033[0m $1"
 }
 
-# Check if running as root
-if [ "$EUID" -ne 0 ]; then
-    print_error "This script must be run as root"
-    exit 1
-fi
+usage() {
+  echo "Usage: $0 <stationId> <systemCode>"
+  echo "Example: $0 station1 linux-ubuntu"
+  exit 1
+}
 
-# Check if both arguments are provided
-if [ $# -ne 2 ]; then
-    print_error "Usage: $0 <stationId> <systemCode>"
-    print_error "Example: $0 station1 linux-ubuntu"
-    exit 1
-fi
+[ "$(id -u)" -eq 0 ] || { print_error "This script must be run as root"; exit 1; }
+
+[ $# -eq 2 ] || { print_error "Missing required arguments"; usage; }
 
 STATION_ID=$1
 SYSTEM_CODE=$2
-OPT_DIR="/opt/stations"
 TARGET_DIR="$OPT_DIR/$STATION_ID"
 LINK_NAME="$SYSTEM_CODE"
 
-# Check if /opt/stations directory exists
-if [ ! -d "$OPT_DIR/stations" ]; then
-    print_status "Creating directory $OPT_DIR/stations"
-    mkdir -p $OPT_DIR
-fi
+[ -d "$OPT_DIR" ] || { mkdir -pv "$OPT_DIR"; }
 
-# Check if link exists
-if [ -L $TARGET_DIR ]; then
-    print_status "Removing link from $TARGET_DIR"
-    rm $TARGET_DIR
-fi
-
-# Create the symlink
-print_status "Creating symlink from $LINK_NAME to $TARGET_DIR"
-ln -s "$LINK_NAME" "$TARGET_DIR"
+ln -sv -f "$LINK_NAME" "$TARGET_DIR" || { print_error "Failed to create symlink"; exit 1; }
 
 print_status "Symlink created successfully:"
 ls -l "$TARGET_DIR"
+
+exit 0
