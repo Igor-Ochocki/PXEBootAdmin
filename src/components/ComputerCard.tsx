@@ -1,15 +1,26 @@
 'use client'
 
-import { Suspense, useState } from 'react'
+import { Suspense, useEffect, useState } from 'react'
 import { Card, CardBody, CardFooter, CardHeader } from "@heroui/react"
 import ComputerStateInfo from "./computerCardInfo/ComputerStateInfo"
 import Modal from "./scheduleForm/Modal"
 import ScheduleForm, { ScheduleFormData } from "./scheduleForm/ScheduleForm"
 import OperatingSystemInfo from './computerCard/operatingSystem/OperatingSystemInfo'
+import { useComputerState } from '@/hooks/useComputerState';
+import { ComputerStateBackgroundColors } from './computerCardInfo/ComputerState';
 
 export default function ComputerCard({ stationId }: { stationId: string }) {
   const [isModalOpen, setIsModalOpen] = useState(false)
   const [isSubmitting, setIsSubmitting] = useState(false)
+  const [stateColor, setStateColor] = useState<string>("")
+
+  const { state, isLoading } = useComputerState(stationId)
+
+  useEffect(() => {
+    if(!isLoading) {
+      setStateColor(ComputerStateBackgroundColors[state?.status as keyof typeof ComputerStateBackgroundColors])
+    }
+  }, [isLoading, state])
 
   const handleCardClick = () => {
     setIsModalOpen(true)
@@ -56,17 +67,17 @@ export default function ComputerCard({ stationId }: { stationId: string }) {
         className="w-full h-[30vh] max-w-[30vw] md:max-w-[22vw] lg:max-w-[15vw] flex items-center justify-center group cursor-pointer"
         onClick={handleCardClick}
       >
-        <Card className="w-[90%] h-full border-quaternary border-2 rounded-xl
-                        hover:bg-tertiary-transparent transition-all duration-300 ease-in-out transform group-hover:scale-110">
+        <Card className={`w-[90%] h-full border-quaternary border-2 rounded-xl
+                        hover:bg-tertiary-transparent transition-all duration-300 ease-in-out transform group-hover:scale-110 ${stateColor !== "" ? stateColor : "bg-transparent"}`}>
           <CardHeader className="p-2 flex items-center justify-center">
-              <p className="text-quinary font-medium text-lg">s{stationId}</p>
+              <p className="text-quinary font-medium text-lg text-outline">s{stationId}</p>
           </CardHeader>
           <CardBody className="h-full flex items-center justify-center">
             <OperatingSystemInfo stationId={stationId} />
           </CardBody>
           <CardFooter className="flex items-center justify-center">
             <Suspense fallback={<div>Loading...</div>}>
-              <ComputerStateInfo stationId={stationId} />
+              <ComputerStateInfo isLoading={isLoading} state={state} />
             </Suspense>
           </CardFooter>
         </Card>

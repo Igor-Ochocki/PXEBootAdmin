@@ -127,7 +127,7 @@ export default function OperatingSystemInfo({ stationId }: { stationId: string }
         <div className="overflow-hidden">
           <h1 className="text-quinary font-medium">{operatingSystem}</h1>
           {subSystem && (
-            <p className="text-quinary/80 text-sm">{subSystem}</p>
+            <p className="text-quinary/80 text-sm text-outline">{subSystem}</p>
           )}
         </div>
         <button

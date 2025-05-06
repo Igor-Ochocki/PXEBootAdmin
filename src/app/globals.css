@@ -46,3 +46,7 @@
     -ms-overflow-style: none;  /* IE and Edge */
     scrollbar-width: none;  /* Firefox */
 }
+
+.text-outline {
+  -webkit-text-stroke: 0.2px white;
+}
