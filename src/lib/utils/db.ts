@@ -34,7 +34,7 @@ export async function initDB() {
     await db.exec(`
         CREATE TABLE IF NOT EXISTS OperatingSystems (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
-            code TEXT NOT NULL,
+            code TEXT NOT NULL UNIQUE,
             name TEXT NOT NULL
         )
     `);
@@ -46,7 +46,8 @@ export async function initDB() {
             code TEXT NOT NULL,
             name TEXT NOT NULL,
             operatingSystemId INTEGER,
-            FOREIGN KEY (operatingSystemId) REFERENCES OperatingSystems(id)
+            FOREIGN KEY (operatingSystemId) REFERENCES OperatingSystems(id),
+            UNIQUE (code, operatingSystemId)
         )
     `);
 

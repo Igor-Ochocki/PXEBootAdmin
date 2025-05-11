@@ -7,8 +7,6 @@ const nextConfig: NextConfig = {
       {
         protocol: 'https',
         hostname: 'apps.usos.pw.edu.pl',
-        port: '',
-        pathname: '/',
       },
     ],
   },
