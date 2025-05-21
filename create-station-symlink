@@ -1,8 +1,6 @@
 #!/bin/sh
-# create-station-symlink - Create a symlink for a station
+# create-station-symlink - Set the operating system for a station
 # ochockii 2025
-
-OPT_DIR="/opt/stations"
 
 print_status() {
   echo -e "\033[1;32m[STATUS]\033[0m $1"
@@ -24,14 +22,8 @@ usage() {
 
 STATION_ID=$1
 SYSTEM_CODE=$2
-TARGET_DIR="$OPT_DIR/$STATION_ID"
 LINK_NAME="$SYSTEM_CODE"
 
-[ -d "$OPT_DIR" ] || { mkdir -pv "$OPT_DIR"; }
-
-ln -sv -f "$LINK_NAME" "$TARGET_DIR" || { print_error "Failed to create symlink"; exit 1; }
-
-print_status "Symlink created successfully:"
-ls -l "$TARGET_DIR"
+curl -X PUT -H "Content-Type: application/json" -d '{"stationId": "$STATION_ID", "operatingSystem": "$SYSTEM_CODE"}' http://localhost:3000/api/machine/os
 
 exit 0

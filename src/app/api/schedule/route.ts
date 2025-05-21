@@ -1,9 +1,18 @@
 import { addSchedule } from '@/lib/utils/db';
 import { getOverlappingSchedule, scheduleTask } from '@/utils/scheduleTask';
 import { NextRequest, NextResponse } from 'next/server';
+import { getUserStatus } from '@/utils/userFieldsFetch';
 
 export async function POST(request: NextRequest) {
   try {
+    const userStatus = await getUserStatus(request);
+    if (userStatus.status !== 200) {
+      return NextResponse.json(
+        { error: 'User is not an active student' },
+        { status: 403 }
+      );
+    }
+
     const accessToken = request.cookies.get('access_token')?.value;
     const accessTokenSecret = request.cookies.get('access_token_secret')?.value;
 

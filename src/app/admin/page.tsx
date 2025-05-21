@@ -13,16 +13,18 @@ import RemoveOperatingSystemForm from '@/components/admin/RemoveOperatingSystemF
 import RemoveSubsystemForm from '@/components/admin/RemoveSubsystemForm';
 import RemoveAdminForm from '@/components/admin/RemoveAdminForm';
 import {
-  UserPlusIcon,
-  UserMinusIcon,
-  DocumentPlusIcon,
-  DocumentMinusIcon,
-  FolderPlusIcon,
-  FolderMinusIcon,
-  Bars3Icon,
-  XMarkIcon,
-  ArrowPathIcon
-} from '@heroicons/react/24/outline';
+  PersonAdd,
+  PersonRemove,
+  NoteAdd,
+  NoteAlt,
+  CreateNewFolder,
+  FolderDelete,
+  Menu,
+  Close,
+  Refresh,
+  Computer
+} from '@mui/icons-material';
+import SetMachineOSForm from "@/components/admin/SetMachineOSForm";
 
 export default function Home() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
@@ -118,6 +120,27 @@ export default function Home() {
     }
   };
 
+  const handleSetMachineOS = async (host: string, operatingSystemCode: string, subsystemCode: string, type: string) => {
+    try {
+      const response = await fetch('/api/operating-system', {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          stationId: host,
+          operatingSystem: operatingSystemCode,
+          subSystem: subsystemCode,
+          type: type
+        })
+      });
+      if (!response.ok) throw new Error('Failed to set machine OS');
+      // Handle success
+    } catch (error) {
+      console.error('Error setting machine OS:', error);
+    }
+  };
+
   const closeModal = () => setActiveModal(null);
 
   return (
@@ -129,7 +152,7 @@ export default function Home() {
           className="p-2 rounded-lg hover:bg-secondary transition-colors duration-300"
           aria-label="Toggle menu"
         >
-          <Bars3Icon className="h-6 w-6 text-quinary" />
+          <Menu className="h-6 w-6 text-quinary" />
         </button>
         <h1 className="text-quaternary text-center text-4xl font-bold">WUT SK Calendar (admin)</h1>
         <div className="flex items-center gap-4">
@@ -148,7 +171,7 @@ export default function Home() {
               className="p-2 rounded-lg hover:bg-secondary transition-colors duration-300"
               aria-label="Close menu"
             >
-              <XMarkIcon className="h-5 w-5 text-quinary" />
+              <Close className="h-5 w-5 text-quinary" />
             </button>
           </div>
 
@@ -161,7 +184,7 @@ export default function Home() {
                   }}
                   className="w-full p-3 text-left text-quinary hover:bg-secondary rounded-lg transition-colors duration-300 flex items-center gap-2"
                 >
-                  <UserPlusIcon className="h-5 w-5" />
+                  <PersonAdd className="h-5 w-5" />
                   Add Admin
                 </button>
               </li>
@@ -172,7 +195,7 @@ export default function Home() {
                   }}
                   className="w-full p-3 text-left text-quinary hover:bg-secondary rounded-lg transition-colors duration-300 flex items-center gap-2"
                 >
-                  <UserMinusIcon className="h-5 w-5" />
+                  <PersonRemove className="h-5 w-5" />
                   Remove Admin
                 </button>
               </li>
@@ -183,7 +206,7 @@ export default function Home() {
                   }}
                   className="w-full p-3 text-left text-quinary hover:bg-secondary rounded-lg transition-colors duration-300 flex items-center gap-2"
                 >
-                  <DocumentPlusIcon className="h-5 w-5" />
+                  <NoteAdd className="h-5 w-5" />
                   Add Operating System
                 </button>
               </li>
@@ -194,7 +217,7 @@ export default function Home() {
                   }}
                   className="w-full p-3 text-left text-quinary hover:bg-secondary rounded-lg transition-colors duration-300 flex items-center gap-2"
                 >
-                  <FolderPlusIcon className="h-5 w-5" />
+                  <CreateNewFolder className="h-5 w-5" />
                   Add Operating Subsystem
                 </button>
               </li>
@@ -205,7 +228,7 @@ export default function Home() {
                   }}
                   className="w-full p-3 text-left text-quinary hover:bg-secondary rounded-lg transition-colors duration-300 flex items-center gap-2"
                 >
-                  <FolderMinusIcon className="h-5 w-5" />
+                  <FolderDelete className="h-5 w-5" />
                   Remove Operating Subsystem
                 </button>
               </li>
@@ -216,7 +239,7 @@ export default function Home() {
                   }}
                   className="w-full p-3 text-left text-quinary hover:bg-secondary rounded-lg transition-colors duration-300 flex items-center gap-2"
                 >
-                  <DocumentMinusIcon className="h-5 w-5" />
+                  <NoteAlt className="h-5 w-5" />
                   Remove Operating System
                 </button>
               </li>
@@ -225,8 +248,19 @@ export default function Home() {
                   onClick={handleSyncSchedules}
                   className="w-full p-3 text-left text-quinary hover:bg-secondary rounded-lg transition-colors duration-300 flex items-center gap-2"
                 >
-                  <ArrowPathIcon className="h-5 w-5" />
+                  <Refresh className="h-5 w-5" />
                   Sync Schedules
+                </button>
+              </li>
+              <li>
+                <button
+                  onClick={() => {
+                    setActiveModal('setMachineOS');
+                  }}
+                  className="w-full p-3 text-left text-quinary hover:bg-secondary rounded-lg transition-colors duration-300 flex items-center gap-2"
+                >
+                  <Computer className="h-5 w-5" />
+                  Set Machine OS
                 </button>
               </li>
             </ul>
@@ -283,6 +317,11 @@ export default function Home() {
         isOpen={activeModal === 'removeAdmin'}
         onClose={closeModal}
         onSubmit={handleRemoveAdmin}
+      />
+      <SetMachineOSForm
+        isOpen={activeModal === 'setMachineOS'}
+        onClose={closeModal}
+        onSubmit={handleSetMachineOS}
       />
     </div>
   );

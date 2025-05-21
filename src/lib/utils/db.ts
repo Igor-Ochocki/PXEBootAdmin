@@ -3,6 +3,7 @@ import { open } from 'sqlite';
 import path from 'path';
 import fs from 'fs';
 import { removeScheduleTask } from '@/utils/scheduleTask';
+import { MachineIpxeConfig } from '@/app/api/ipxe/route';
 
 // Ensure the data directory exists
 const dataDir = path.join(process.cwd(), 'data');
@@ -73,6 +74,16 @@ export async function initDB() {
       CREATE TABLE IF NOT EXISTS Admins (
         id INTEGER PRIMARY KEY AUTOINCREMENT,
         userId TEXT NOT NULL
+      )
+    `);
+
+    // Create HostnameIpxeConfigs table if it doesn't exist
+    await db.exec(`
+      CREATE TABLE IF NOT EXISTS HostnameIpxeConfigs (
+        hostname TEXT PRIMARY KEY,
+        target_script_name TEXT NOT NULL,
+        version_tag TEXT,
+        type_tag TEXT
       )
     `);
 
@@ -189,5 +200,37 @@ export async function addOperatingSubsystem(code: string, name: string, operatin
 export async function deleteOperatingSubsystem(id: number) {
     const db = await initDB();
     await db.run('DELETE FROM SubSystems WHERE id = ?', [id]);
+}
+
+export async function setIpxeConfigByHostname(hostname: string, target_script_name: string, version_tag: string, type_tag: string) {
+    const db = await initDB();
+    const existingConfig = await db.get('SELECT * FROM HostnameIpxeConfigs WHERE hostname = ?', [hostname]);
+    if (existingConfig) {
+        await db.run('UPDATE HostnameIpxeConfigs SET target_script_name = ?, version_tag = ?, type_tag = ? WHERE hostname = ?', [target_script_name, version_tag, type_tag, hostname]);
+    } else {
+        await db.run('INSERT INTO HostnameIpxeConfigs (hostname, target_script_name, version_tag, type_tag) VALUES (?, ?, ?, ?)', [hostname, target_script_name, version_tag, type_tag]);
+    }
+}
+
+export async function getMachineOperatingSystem(stationId: string) {
+    const db = await initDB();
+    const operatingSystem = await db.get('SELECT target_script_name, version_tag FROM HostnameIpxeConfigs WHERE hostname = ?', [stationId]);
+    return `${operatingSystem.target_script_name} ${operatingSystem.version_tag}`;
+}
+
+export async function getIpxeConfigByHostname(hostname: string): Promise<MachineIpxeConfig | null> {
+    const db = await open({ filename: dbPath, driver: sqlite3.Database });
+    try {
+        const config = await db.get<MachineIpxeConfig | undefined>(
+            'SELECT target_script_name, version_tag, type_tag FROM HostnameIpxeConfigs WHERE hostname = ?',
+            hostname
+        );
+        return config || null;
+    } catch (error) {
+        console.error(`Error fetching iPXE config for hostname ${hostname}:`, error);
+        return null;
+    } finally {
+        await db.close();
+    }
 }
 

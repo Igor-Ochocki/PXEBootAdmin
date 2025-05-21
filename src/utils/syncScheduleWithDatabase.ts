@@ -39,6 +39,5 @@ export async function syncScheduleWithDatabase() {
     }
   } catch (error) {
     console.error('Error syncing schedules:', error);
-    throw error;
   }
 }

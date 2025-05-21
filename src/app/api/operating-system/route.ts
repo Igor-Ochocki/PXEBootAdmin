@@ -1,13 +1,18 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { initDB } from '@/lib/utils/db';
+import { initDB, setIpxeConfigByHostname } from '@/lib/utils/db';
 import { revalidatePath } from 'next/cache';
-import { exec } from 'child_process';
-import { promisify } from 'util';
+import { getUserStatus } from '@/utils/userFieldsFetch';
 
-const execAsync = promisify(exec);
-
-export async function GET() {
+export async function GET(request: NextRequest) {
     try {
+        const userStatus = await getUserStatus(request);
+        if (userStatus.status !== 200) {
+            return NextResponse.json(
+                { error: 'User is not an active student' },
+                { status: 403 }
+            );
+        }
+
         const db = await initDB();
         const operatingSystems = await db.all('SELECT * FROM OperatingSystems');
         await db.close();
@@ -19,10 +24,21 @@ export async function GET() {
 }
 
 export async function PUT(request: NextRequest) {
-    const { stationId, operatingSystem, subSystem } = await request.json();
+    try {
+        const userStatus = await getUserStatus(request);
+        if (userStatus.status !== 200) {
+            return NextResponse.json(
+                { error: 'User is not an active student' },
+                { status: 403 }
+            );
+        }
 
-    const command = `create-station-symlink ${stationId} '${operatingSystem} ${subSystem}'`;
-    await execAsync(command);
-    revalidatePath(`/`);
-    return NextResponse.json({ message: 'Operating system updated' });
+        const { stationId, operatingSystem, subSystem = '', type = '' } = await request.json();
+        await setIpxeConfigByHostname(stationId, operatingSystem, subSystem, type);
+        revalidatePath(`/`);
+        return NextResponse.json({ message: 'Operating system updated' });
+    } catch (error) {
+        console.error('Error updating operating system:', error);
+        return NextResponse.json({ error: 'Failed to update operating system' }, { status: 500 });
+    }
 }

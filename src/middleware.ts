@@ -3,7 +3,10 @@ import type { NextRequest } from 'next/server'
 
 export function middleware(request: NextRequest) {
   const accessToken = request.cookies.get('access_token')
-  const excludedRoutes = ['/api/auth', '/api/user']
+  if (request.nextUrl.pathname.startsWith('/api/machine/os') && request.method === 'PUT') {
+    return NextResponse.next()
+  }
+  const excludedRoutes = ['/api/auth', '/api/user', '/api/ipxe']
   const isAuthPage = request.nextUrl.pathname.startsWith('/auth')
   const isExcludedRoute = excludedRoutes.some(route => request.nextUrl.pathname.startsWith(route))
   const isProtectedApi = !isAuthPage && !isExcludedRoute && request.nextUrl.pathname.startsWith('/api')

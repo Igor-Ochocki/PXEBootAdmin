@@ -1,8 +1,17 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { initDB } from '@/lib/utils/db';
+import { getUserStatus } from '@/utils/userFieldsFetch';
 
 export async function GET(request: NextRequest) {
   try {
+    const userStatus = await getUserStatus(request);
+    if (userStatus.status !== 200) {
+      return NextResponse.json(
+        { error: 'User is not an active student' },
+        { status: 403 }
+      );
+    }
+
     const db = await initDB();
     const { searchParams } = new URL(request.url);
     const os = searchParams.get('os');
