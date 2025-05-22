@@ -18,12 +18,7 @@ export async function syncScheduleWithDatabase() {
   try {
     const db = await initDB();
     const furtherSchedules: Schedule[] = await db.all('SELECT id, stationId, startDate, startTime, operatingSystem, subSystem FROM Schedules WHERE startDate >= ?', [new Date().toISOString().split('T')[0]]);
-    const {stdout} = await execAsync(`ls -p | grep executed || true`);
-    if(stdout.includes('executed')) {
-      return;
-    }
-    await execAsync(`sudo touch executed`);
-    await execAsync(`sudo atq | awk '{print $1}' | xargs -r atrm`);
+    await execAsync(`atrm`);
 
     for (const schedule of furtherSchedules) {
       const { id, stationId, startDate, startTime, operatingSystem, subSystem } = schedule;
