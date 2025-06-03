@@ -48,6 +48,12 @@ command -v at >/dev/null 2>&1 || {
   fi
 }
 
+# Check if amt-manager installed globally
+if ! command -v amt-manager >/dev/null 2>&1; then
+  print_error "The 'amt-manager' command is not installed. Installing..."
+  sudo npm install -g amt-manager-test
+fi
+
 systemctl is-active --quiet atd 2>/dev/null || {
   print_status "Starting atd service..."
   sudo systemctl start atd
