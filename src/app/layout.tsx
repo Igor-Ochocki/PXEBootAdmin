@@ -14,8 +14,8 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "WUT SK Calendar",
-  description: "App that allows scheduling computer stations at WUT SK",
+  title: "PXE Boot Admin",
+  description: "App that allows scheduling computer stations at WUT SK PXE Boot",
 };
 
 export default function RootLayout({

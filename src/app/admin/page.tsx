@@ -154,7 +154,7 @@ export default function Home() {
         >
           <Menu className="h-6 w-6 text-quinary" />
         </button>
-        <h1 className="text-quaternary text-center text-4xl font-bold">WUT SK Calendar (admin)</h1>
+        <h1 className="text-quaternary text-center text-4xl font-bold">PXE Boot Admin (admin)</h1>
         <div className="flex items-center gap-4">
           <UserPhoto />
           <LogoutButton />
@@ -284,7 +284,7 @@ export default function Home() {
 
       {/* Footer Section */}
       <section className="p-2 flex items-center justify-center">
-        <p className="text-quinary">© 2025 WUT SK Calendar</p>
+        <p className="text-quinary">© 2025 PXE Boot Admin</p>
       </section>
 
       {/* Modals */}

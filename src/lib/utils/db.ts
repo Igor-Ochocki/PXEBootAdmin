@@ -11,7 +11,7 @@ if (!fs.existsSync(dataDir)) {
     fs.mkdirSync(dataDir);
 }
 
-const dbPath = path.join(dataDir, 'wutsk.db');
+const dbPath = path.join(dataDir, 'pxe-boot-admin.db');
 
 // Initialize database
 export async function initDB() {

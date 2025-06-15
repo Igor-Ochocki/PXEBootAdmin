@@ -11,7 +11,7 @@ export default async function Home() {
       {/* Header Section */}
       <section className="p-4 flex items-center justify-between">
         <div className="w-[200px]" /> {/* Spacer to balance the header */}
-        <h1 className="text-quaternary text-center text-4xl font-bold">WUT SK Calendar</h1>
+        <h1 className="text-quaternary text-center text-4xl font-bold">PXE Boot Admin</h1>
         <div className="flex items-center gap-4 w-[200px]">
           <UserPhoto />
           <LogoutButton />
@@ -34,7 +34,7 @@ export default async function Home() {
 
       {/* Footer Section */}
       <section className="p-2 flex items-center justify-center">
-        <p className="text-quinary">© 2025 WUT SK Calendar</p>
+        <p className="text-quinary">© 2025 PXE Boot Admin</p>
       </section>
     </div>
   );
